@@ -1,0 +1,30 @@
+#######################################
+# Syntax Coloring Map For PluimLib
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+FlashBuffer KEYWORD1
+LED         KEYWORD1
+Timer       KEYWORD1
+Clock       KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+ESP8266   	KEYWORD2
+Flash   	KEYWORD2
+CyclicBuf	KEYWORD2
+Stack	    KEYWORD2
+pop	        KEYWORD2
+push	    KEYWORD2
+alarm	    KEYWORD2
+NTP 	    KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
