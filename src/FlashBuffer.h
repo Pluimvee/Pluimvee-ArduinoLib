@@ -1,26 +1,26 @@
 #pragma once
 #include <arduino.h>
+#include <LittleFS.h>
+
 ////////////////////////////////////////////////////////////////////////////////////////////
-// FlashCache is a cyclic buffer in flash memeory based on LittleFS
-// It can be used to read and write records in flash, it overwrites the oldest records 
-// when reached full
+// FlashBuffer is a cyclic buffer in flash memory based on LittleFS
+// On push() with a full buffer the force flag will overwrite the oldest record
 ////////////////////////////////////////////////////////////////////////////////////////////
-class FlashStack
+class FlashBuffer
 {
 public:
-//  inline bool begin(size_t size, const char* name=0) { return begin(sizeof(Type), size, name); };
-//  inline bool put(const Type& t) { return put((const uint8_t*) t); };
+  template <typename T> bool begin(const char *name) { return begin(name, sizeof(T), 0); };
 
-  bool begin(const char* cache_name, size_t record_size, size_t cache_size=0); 
+  bool begin(const char* name, size_t record_size, size_t capacity=0); 
   bool reset(); // reset head and tail in existing cache
   bool push(const void *record, bool force=false);  // if force=true and cache is full it will overwrite the oldest record
   bool peek(void *record) const;
   bool pop(void *record = 0);     // without a record it will pop and ignore
-  inline size_t count() const { return _meta.count; };
-  inline size_t max() const   { return _meta.max; };
-  inline bool isempty() const { return count() == 0; };
-  inline size_t space() const { return max() - count(); };
-  inline bool isfull() const  { return max() == count(); };
+  inline size_t count() const     { return _meta.count; };
+  inline size_t capacity() const  { return _meta.max; };
+  inline size_t space() const     { return capacity() - count(); };
+  inline bool isempty() const     { return count() == 0; };
+  inline bool isfull() const      { return capacity() == count(); };
 
 private:
   mutable File _file;
@@ -35,15 +35,5 @@ private:
   bool _flush();          // flush the meta and anything else what was written
 };
 
-/*
-template <typename Type> class FStack : public FlashStack
-{
-public:
-  inline bool begin(const char* cache_name) { return FlashStack::begin(cache_name, sizeof(Type), 0); };
-  inline bool push(Type *record, bool force=false) { return FlashStack::push((void*) record, force); };
-  inline bool peek(Type *record) const { return FlashStack::peek((void*) record); };
-  inline bool pop(Type *record=0) { return FlashStack::pop((void*) record); };
-};
-*/
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////

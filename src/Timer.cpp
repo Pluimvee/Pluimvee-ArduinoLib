@@ -1,4 +1,4 @@
-#include "Timer.h"
+#include <Timer.h>
 #include <time.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,22 +53,4 @@ uint32_t Timer::elapsed() const {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
-//
-////////////////////////////////////////////////////////////////////////////////////////////
-#define TZ_DST_AMSTERDAM "CET-1CEST,M3.5.0/2,M10.5.0/3"
-
-bool Clock::ntp_sync()
-{
-  configTime(TZ_DST_AMSTERDAM, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
-
-  struct tm tmstruct;
-  int retry=0;
-  while (getLocalTime(&tmstruct) == false) {
-    if (retry++ > 10)
-      return false;
-    delay(500);
-  }
-  adjust(DateTime(tmstruct.tm_year, tmstruct.tm_mon+1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec));
-  return true;
-}
 

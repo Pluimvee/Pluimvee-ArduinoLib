@@ -1,19 +1,16 @@
 #pragma once
-#include <arduino.h>
+#include <Arduino.h>
+#include <RTClib.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-//
+// The ntp_sync is used to get the time synced with NTP servers
+// it can be used to adjust the RTClibs
+// use it  after being connected to the WiFi on a regular (daily?) basis
 ////////////////////////////////////////////////////////////////////////////////////////////
-class LED
-{
+class Clock : public RTC_Millis {
 public:
-	LED(int pin=LED_BUILTIN);
-  	void on();
-  	void off();
-	void blink();
-private:
-	int _state;
-	int _pin;  // default pin 13 on Andruino, pin 2 on ESP8266
+  bool ntp_sync();
+  inline uint32_t unitxtime() { return lastUnix; };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

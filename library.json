@@ -1,0 +1,20 @@
+{
+    "name": "Pluimvee ArduinoLib",
+    "description": "Bootstrapper wrapper arround several libraries",
+    "keywords": "HA, MQTT, DS, RTC, NTP",
+    "authors": [
+        {
+            "name": "Erik Veer",
+            "maintainer": true
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Pluimvee/Pluimvee-ArduinoLib"
+    },
+    "version": "0.1.1",
+    "frameworks": "Arduino",
+    "examples": [
+        "examples/*/*.pde"
+    ]
+}
