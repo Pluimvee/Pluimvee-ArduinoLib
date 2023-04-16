@@ -1,5 +1,7 @@
 #include <FlashBuffer.h>
-#define LOG_LEVEL 0
+#define LOG_REMOTE
+#define LOG_LEVEL   2
+#define LOG_PREFIX  "[FlashBuffer] - "
 #include <Logging.h>
 
 #if (0)
@@ -17,12 +19,17 @@ bool FlashBuffer::begin(const char* name, size_t record_size, size_t capacity)
      return false;
   FSInfo info;
   LittleFS.info(info);
-  INFO("File system mounted: blocksize %d, total %d, used %d\n", info.blockSize, info.totalBytes, info.usedBytes);
+  INFO(LOG_PREFIX "File system mounted: blocksize %d, total %d, used %d\n", info.blockSize, info.totalBytes, info.usedBytes);
 
-  _file = LittleFS.open(name, "r+");    // open for reading and writing, w+ would truncate the file, a+ would have all output appended
+  _file = LittleFS.open(name, "r+");      // first try to open an existing file for reading and writing
   if (!_file)
-    return false; //_err("Failed to open caching file for writing");
-  INFO("File \'%s\' opened\n", name);
+    _file = LittleFS.open(name, "w+");    // second try to open a new file for writing and reading (we can not use a+ as all writing would be appended)
+  if (!_file)
+  {
+    ERROR(LOG_PREFIX "Failed to open caching file for writing"); // still no file.... error!
+    return false;
+  }
+  INFO(LOG_PREFIX "File \'%s\' opened\n", name);
 
   if (_file.size() < sizeof(_meta))
   {
@@ -31,7 +38,7 @@ bool FlashBuffer::begin(const char* name, size_t record_size, size_t capacity)
     if (capacity == 0)     
       capacity = (BLOCK_SIZE - sizeof(_meta)) / record_size;
 
-    INFO("Creating new cache for records holding %d bytes. capacity nr of records %d\n", record_size, capacity);
+    INFO(LOG_PREFIX "Creating new cache for records holding %d bytes. capacity nr of records %d\n", record_size, capacity);
     _meta.size  = record_size;
     _meta.max   = capacity;
     _meta.head  = 0;
@@ -45,10 +52,10 @@ bool FlashBuffer::begin(const char* name, size_t record_size, size_t capacity)
     if (!_file.seek(0) ||
         _file.read((uint8_t*)&_meta, sizeof(_meta)) != sizeof(_meta))
       return false;
-    DEBUG("Meta data read with size %d, max %d, head %d, tail %d, count %d\n", _meta.size, _meta.max, _meta.head, _meta.tail, _meta.count);
+    DEBUG(LOG_PREFIX "Meta data read with size %d, max %d, head %d, tail %d, count %d\n", _meta.size, _meta.max, _meta.head, _meta.tail, _meta.count);
     if (_meta.size != record_size)
     {
-      INFO("Record size changed !! Wipe existing cache and start over with with a new cache\n");
+      INFO(LOG_PREFIX "Record size changed !! Wipe existing cache and start over with with a new cache\n");
       _file.truncate(0);  // truncate file to 0 bytes
       _file.close();      // close the file as the call to begin will re-open
       return begin(name, record_size, capacity);
@@ -69,7 +76,7 @@ bool FlashBuffer::_flush() {
       _file.write((uint8_t*) &_meta, sizeof(_meta)) == sizeof(_meta))
   {
     _file.flush();
-    INFO("Meta flushed [size %d, max %d, head %d, tail %d, count %d]\n", _meta.size, _meta.max, _meta.head, _meta.tail, _meta.count);
+    INFO(LOG_PREFIX "Meta flushed [size %d, max %d, head %d, tail %d, count %d]\n", _meta.size, _meta.max, _meta.head, _meta.tail, _meta.count);
     return true;
   }
   return false;
@@ -88,12 +95,12 @@ bool FlashBuffer::push(const void *record, bool force)
 {
   if (isfull() && !force)
     return false;
-  DEBUG("Writing record at %d\n", _meta.head);
-  if (!_seek(_meta.head))
-    return false;
-  if (_file.write((uint8_t*) record, _meta.size) != _meta.size)
-    return false;
+  DEBUG(LOG_PREFIX "Writing record at %d\n", _meta.head);
 
+  if (!_seek(_meta.head) || _file.write((uint8_t*) record, _meta.size) != _meta.size) {
+    ERROR(LOG_PREFIX "Error pushing record to cache\n");
+    return false;
+  }
   // If the cache is full (and force is set) we have just written over the tail record 
   // we must increase the tail and rollover if needed
   if (isfull()) {
@@ -114,7 +121,7 @@ bool FlashBuffer::push(const void *record, bool force)
 ////////////////////////////////////////////////////////////////////////////////////////////
 bool FlashBuffer::peek(void *record) const
 {
-  DEBUG("Peeking record at %d\n", _meta.tail);
+  DEBUG(LOG_PREFIX "Peeking record at %d\n", _meta.tail);
   return  !isempty() &&
           _seek(_meta.tail) &&
           _file.read((uint8_t*) record, _meta.size) == _meta.size;
@@ -125,7 +132,7 @@ bool FlashBuffer::peek(void *record) const
 ////////////////////////////////////////////////////////////////////////////////////////////
 bool FlashBuffer::pop(void *record)
 {
-  DEBUG("Retrieving record at %d\n", _meta.tail);
+  DEBUG(LOG_PREFIX "Retrieving record at %d\n", _meta.tail);
   if (record && !peek(record))  // if record is given, retrieve the record using the peek method
     return false;
   

@@ -5,7 +5,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Timer::Timer(uint32_t ms) {
-  alarm(ms);
+  set(ms);
 }
 
 // set the current time
@@ -14,13 +14,13 @@ void Timer::start() {
 }
 
 // set the alarm and restart
-void Timer::alarm(uint32_t ms) {
+void Timer::set(uint32_t ms) {
   _alarm = ms;
   start();
 }
 
 // check the alarm
-bool Timer::alarm() const {
+bool Timer::passed() const {
   return elapsed() > _alarm;
 }
 

@@ -9,14 +9,14 @@ class Timer
 public:
   Timer(uint32_t ms=0);       // argument sets the alarm
   void start();
-  uint32_t elapsed() const;   // elapsed ms, corrected for rollover (which occurs each 49.7 days)
+  uint32_t elapsed() const;        // elapsed ms, corrected for rollover (which occurs each 49.7 days)
   int seconds() const;        // elapsed sec
   int minutes() const;        // elapsed min
   String stamp() const;       // elapsed timestamp as mm:ss.mmm
   
   // alarm
-  void alarm(uint32_t ms);    // sets the alarm target in ms from now
-  bool alarm() const;         // returns true when target reached (ms elapsed)
+  void set(uint32_t ms);    // sets the alarm target in ms from now
+  bool passed() const;      // returns true when target reached (ms elapsed)
 
 private:
   uint32_t _start = 0,        // the time we started

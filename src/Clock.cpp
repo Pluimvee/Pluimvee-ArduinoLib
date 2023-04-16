@@ -18,7 +18,8 @@ bool Clock::ntp_sync()
       return false;
     delay(500);
   }
-  adjust(DateTime(tmstruct.tm_year, tmstruct.tm_mon+1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec));
+  // localtime is based on 1970 while class DateTime is based on year 2000
+  adjust(DateTime(tmstruct.tm_year-100, tmstruct.tm_mon+1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec));
   return true;
 }
 
