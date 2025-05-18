@@ -10,7 +10,7 @@
 class Clock : public RTC_Millis {
 public:
   bool ntp_sync();
-  inline uint32_t unitxtime() { return lastUnix; };
+  inline uint32_t unixtime() { return lastUnix; };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

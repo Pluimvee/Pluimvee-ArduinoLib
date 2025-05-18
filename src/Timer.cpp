@@ -37,7 +37,7 @@ int Timer::minutes() const {
 String Timer::stamp() const {
   uint32_t e = elapsed();
   char buf[32];
-  sprintf(buf, "%02d:%02d.%03d", e/60000,e/1000%60, e%1000);
+  sprintf(buf, "%02d:%02d:%03d", e/60000,e/1000%60, e%1000);
   return String(buf);
 }
 

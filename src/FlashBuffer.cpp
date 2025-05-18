@@ -1,5 +1,5 @@
 #include <FlashBuffer.h>
-#define LOG_REMOTE
+
 #define LOG_LEVEL   2
 #define LOG_PREFIX  "[FlashBuffer] - "
 #include <Logging.h>

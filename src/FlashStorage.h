@@ -1,14 +1,17 @@
 #pragma once
 #include <arduino.h>
-#include <LittleFS.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// FlashConfig stores configuration in the flash memory using JSON format
+// FlashStorage stores configuration in the flash memory
 ////////////////////////////////////////////////////////////////////////////////////////////
-class FlashConfig
+class FlashStorage
 {
 public:
-  bool begin(const char* config, size_t max_size=0); 
+//  template<typename T> bool write(const T* r)  { return write(r, sizeof(r)); }
+//  template<typename T> bool read(T* r)         { return read(r, sizeof(r)); }
+  bool begin();
+//  bool write(const void *record, size_t lg);
+//  bool read(void *record, size_t lg);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

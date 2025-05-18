@@ -1,6 +1,10 @@
 #include <FlashBuffer.h>
-#define LOG_LEVEL 0
+#define LOG_LEVEL 3
 #include <Logging.h>
+
+void LOG_CALLBACK(const char* txt) {
+  Serial.println(txt);
+}
 
 FlashBuffer cache;
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,10 +21,10 @@ void setup()
   Serial.begin(115200);
   delay(1000);
 
-  DEBUG("\nStarting cache library\n");
+  DEBUG("Starting cache library");
   cache.begin<record>("/test");
 
-  DEBUG("Cache status: full %d, empty %d, count %d, space %d\n", cache.isfull(), cache.isempty(), cache.count(), cache.space());
+  DEBUG("Cache status: full %d, empty %d, count %d, space %d", cache.isfull(), cache.isempty(), cache.count(), cache.space());
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +35,7 @@ int last_popped = 0;
 
 void loop() 
 {
-  INFO("Cache status: full %d, empty %d, count %d, space %d\n", cache.isfull(), cache.isempty(), cache.count(), cache.space());
+  INFO("Cache status: full %d, empty %d, count %d, space %d", cache.isfull(), cache.isempty(), cache.count(), cache.space());
 
   record r;
   switch (random() % 3)
@@ -39,9 +43,9 @@ void loop()
     case 0:
     default:
       if (!cache.peek(&r))
-        ERROR("FAILED peeking record -- buffer empty? %s\n", cache.isempty()? "YES": "NO");
+        ERROR("FAILED peeking record -- buffer empty? %s", cache.isempty()? "YES": "NO");
       else
-        DEBUG("Record peeked: id %d, stamp %d, text %s\n", r.other[0], r.time, r.text);
+        DEBUG("Record peeked: id %d, stamp %d, text %s", r.other[0], r.time, r.text);
       break;
 
     case 1:
@@ -51,17 +55,17 @@ void loop()
       if (cache.push(&r))
         DEBUG("Record added: id %d, stamp %d, text %s\n", r.other[0], r.time, r.text);
       else
-        ERROR("FAILED adding new record\n");
+        ERROR("FAILED adding new record");
       break;
 
     case 2:
       if (!cache.pop(&r))
-        ERROR("FAILED getting record -- buffer empty? %s\n", cache.isempty()? "YES": "NO");
+        ERROR("FAILED getting record -- buffer empty? %s", cache.isempty()? "YES": "NO");
       else
       {
-        DEBUG("Record popped: id %d, stamp %d, text %s\n", r.other[0], r.time, r.text);
+        DEBUG("Record popped: id %d, stamp %d, text %s", r.other[0], r.time, r.text);
         if (last_popped != r.other[0])
-          ERROR("ERROR popped msg id %d while expected %d -- reason overflow? %s\n", r.other[0], last_popped, cache.isfull()? "YES": "NO");
+          ERROR("ERROR popped msg id %d while expected %d -- reason overflow? %s", r.other[0], last_popped, cache.isfull()? "YES": "NO");
 
         last_popped = r.other[0] +1;
       }
